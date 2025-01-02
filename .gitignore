@@ -181,3 +181,4 @@ data/preprocessed_data/new_train.csv
 data/preprocessed_data/new_turns.csv
 data/cleaned_data/cleaned_test.csv
 data/cleaned_data/cleaned_train.csv
+temp_files/
