@@ -1,4 +1,4 @@
-from Model.Transformers.abstract_tranformer import AbstractTransformer
+from Model.Pipeline.Transformers.abstract_tranformer import AbstractTransformer
 import pandas as pd
 from typing import Dict
 

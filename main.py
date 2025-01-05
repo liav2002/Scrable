@@ -1,7 +1,7 @@
 import pandas as pd
+from Model.Pipeline.pipeline import DataPipeline
 from sklearn.model_selection import train_test_split
-from Model.model import ModelHandler
-from Model.pipeline import DataPipeline
+from Model.Models.regression_model import RegressionModel
 
 def load_data():
     """
@@ -33,7 +33,7 @@ def main():
     X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
 
     # Train and evaluate model
-    model_handler = ModelHandler()
+    model_handler = RegressionModel()
     model_handler.fit(X_train, y_train)
     metrics = model_handler.evaluate(X_val, y_val)
 
