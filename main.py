@@ -2,6 +2,8 @@ import pandas as pd
 from Model.Pipeline.pipeline import DataPipeline
 from sklearn.model_selection import train_test_split
 from Model.Models.regression_model import RegressionModel
+# from Model.Models.random_forest_model import RandomForestModel
+
 
 def load_data():
     """
@@ -18,7 +20,7 @@ def main():
     bots_and_scores = {"BetterBot": 268240632, "STEEBot": 276067680, "HastyBot": 588506671}
     train_df, test_df, games_df, turns_df = load_data()
 
-    # Create pipline
+    # Create pipeline
     pipeline = DataPipeline(bots_and_scores, turns_df, games_df)
 
     # Process train and test datasets
@@ -32,19 +34,44 @@ def main():
     # Train-test split
     X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # Train and evaluate model
-    model_handler = RegressionModel()
-    model_handler.fit(X_train, y_train)
-    metrics = model_handler.evaluate(X_val, y_val)
+    # Dictionary of models to evaluate
+    models = {
+        "Linear Regression": RegressionModel()
+    }
 
-    print("Model Performance on Validation Set:")
-    for metric, value in metrics.items():
-        print(f"{metric}: {value:.4f}")
+    # Evaluate all models
+    results = []
+    for model_name, model_handler in models.items():
+        print(f"Training and evaluating {model_name}...")
+        model_handler.fit(X_train, y_train)
+        metrics = model_handler.evaluate(X_val, y_val)
+        results.append({
+            "Model": model_name,
+            **metrics
+        })
 
-    # Predict on test data
+    # Create a summary DataFrame for easier comparison
+    results_df = pd.DataFrame(results)
+
+    # Find the best model based on RMSE
+    best_model_row = results_df.loc[results_df["RMSE"].idxmin()]
+    best_model_name = best_model_row["Model"]
+    best_rmse = best_model_row["RMSE"]
+
+    # Print the summary
+    print("\nModel Performance Summary:")
+    print(results_df.to_string(index=False))
+
+    print(f"\nBest Model: {best_model_name} (RMSE: {best_rmse:.4f})")
+
+    # Train the best model on the entire training set and predict on test data
+    best_model_handler = models[best_model_name]
+    best_model_handler.fit(X, y)
+
     X_test = processed_test_df.drop(columns=["user_rating"], errors="ignore")
-    test_predictions = model_handler.predict(X_test)
+    test_predictions = best_model_handler.predict(X_test)
 
+    # Print sample predictions
     print("\nSample Test Predictions:")
     for idx, pred in enumerate(test_predictions[:10]):
         print(f"Test Sample {idx + 1}: Predicted Rating = {pred:.2f}")
