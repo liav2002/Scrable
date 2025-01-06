@@ -1,8 +1,7 @@
 import pandas as pd
-from Model.Pipeline.pipeline import DataPipeline
 from sklearn.model_selection import train_test_split
+from Model.Pipeline.pipeline import DataPipeline
 from Model.Models.regression_model import RegressionModel
-# from Model.Models.random_forest_model import RandomForestModel
 
 
 def load_data():
