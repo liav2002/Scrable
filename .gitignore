@@ -170,14 +170,10 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-data/source_data/games.csv
-data/source_data/sample_submission.csv
-data/source_data/test.csv
-data/source_data/train.csv
-data/source_data/turns.csv
-data/preprocessed_data/new_games.csv
-data/preprocessed_data/new_test.csv
-data/preprocessed_data/new_train.csv
-data/preprocessed_data/new_turns.csv
-data/cleaned_data/cleaned_test.csv
-data/cleaned_data/cleaned_train.csv
+data/
+logs/
+output/
+temp_files/
+EDA/output_EDA/
+EDA/notebooks/temp.ipynb
+EDA/notebooks/comments.txt
