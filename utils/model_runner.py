@@ -1,6 +1,9 @@
 import importlib
 import pandas as pd
+from utils.logger import Logger
 from sklearn.model_selection import train_test_split
+
+logger = Logger()
 
 
 def get_model_instance(model_class_path: str):
@@ -19,10 +22,10 @@ def get_model_instance(model_class_path: str):
 
 
 def run_models(
-    train_df: pd.DataFrame,
-    test_df: pd.DataFrame,
-    models: dict,
-    config: dict,
+        train_df: pd.DataFrame,
+        test_df: pd.DataFrame,
+        models: dict,
+        config: dict,
 ) -> tuple:
     """
     Train and evaluate multiple models, and determine the best model by RMSE.
@@ -40,39 +43,33 @@ def run_models(
             - best_rmse (float): RMSE score of the best model.
             - test_predictions (list): Predictions on the test dataset by the best model.
     """
-    # Load train-test split parameters
     split_config = config["train_test_split"]
     test_size = split_config["test_size"]
     random_state = split_config["random_state"]
 
-    # Prepare training and validation data
+    logger.log("Preparing training and validation data...")
     x = train_df.drop(columns=["user_rating"])
     y = train_df["user_rating"]
     x_train, x_val, y_train, y_val = train_test_split(
         x, y, test_size=test_size, random_state=random_state
     )
 
-    # Evaluate all models
     results = []
     for model_name, model_handler in models.items():
-        print(f"Training and evaluating {model_name}...")
+        logger.log(f"Training and evaluating {model_name}...")
         model_handler.fit(x_train, y_train)
         metrics = model_handler.evaluate(x_val, y_val)
         results.append({"Model": model_name, **metrics})
 
-    # Create a summary DataFrame
     results_df = pd.DataFrame(results)
-
-    # Find the best model by RMSE
     best_model_row = results_df.loc[results_df["RMSE"].idxmin()]
     best_model_name = best_model_row["Model"]
     best_rmse = best_model_row["RMSE"]
 
-    # Train the best model on the full training data
+    logger.log(f"Best model is {best_model_name} with RMSE: {best_rmse:.4f}")
     best_model_handler = models[best_model_name]
     best_model_handler.fit(x, y)
 
-    # Predict on the test data
     x_test = test_df.drop(columns=["user_rating"], errors="ignore")
     test_predictions = best_model_handler.predict(x_test)
 

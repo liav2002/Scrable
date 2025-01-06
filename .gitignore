@@ -171,6 +171,7 @@ cython_debug/
 .pypirc
 
 data/
+logs/
 temp_files/
 EDA/notebooks/temp.ipynb
 EDA/notebooks/comments.txt
