@@ -19,9 +19,10 @@ def get_model_instance(model_class_path: str):
 
 
 def run_models(
-        train_df: pd.DataFrame,
-        test_df: pd.DataFrame,
-        models: dict,
+    train_df: pd.DataFrame,
+    test_df: pd.DataFrame,
+    models: dict,
+    config: dict,
 ) -> tuple:
     """
     Train and evaluate multiple models, and determine the best model by RMSE.
@@ -30,7 +31,7 @@ def run_models(
         train_df (pd.DataFrame): Processed training data.
         test_df (pd.DataFrame): Processed test data.
         models (dict): A dictionary of models to evaluate.
-                       Keys are model names, and values are model instances.
+        config (dict): Configuration dictionary.
 
     Returns:
         tuple: A tuple containing:
@@ -39,10 +40,17 @@ def run_models(
             - best_rmse (float): RMSE score of the best model.
             - test_predictions (list): Predictions on the test dataset by the best model.
     """
+    # Load train-test split parameters
+    split_config = config["train_test_split"]
+    test_size = split_config["test_size"]
+    random_state = split_config["random_state"]
+
     # Prepare training and validation data
     x = train_df.drop(columns=["user_rating"])
     y = train_df["user_rating"]
-    x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.2, random_state=42)
+    x_train, x_val, y_train, y_val = train_test_split(
+        x, y, test_size=test_size, random_state=random_state
+    )
 
     # Evaluate all models
     results = []

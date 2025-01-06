@@ -28,7 +28,7 @@ def main():
 
     # Run models and evaluate
     results_df, best_model_name, best_rmse, test_predictions = run_models(
-        processed_train_df, processed_test_df, models
+        processed_train_df, processed_test_df, models, config
     )
 
     # Display results

@@ -6,3 +6,7 @@ bots_and_scores:
 models:
   Linear Regression:
     class: "Model.Models.regression_model.RegressionModel"
+
+train_test_split:
+  test_size: 0.2
+  random_state: 42
