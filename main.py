@@ -1,7 +1,7 @@
 import yaml
 from utils.data_loader import load_data
-from utils.model_runner import run_models
 from utils.config_loader import load_config
+from utils.model_runner import run_models, get_model_instance
 from Model.Pipeline.pipeline import DataPipeline
 from Model.Models.regression_model import RegressionModel
 
@@ -21,9 +21,15 @@ def main():
     processed_train_df = pipeline.process_train_data(train_df)
     processed_test_df = pipeline.process_test_data(test_df)
 
-    # Run and evaluate models
+    # Define models to evaluate
+    models = {
+        model_name: get_model_instance(model_details["class"])
+        for model_name, model_details in config["models"].items()
+    }
+
+    # Run models and evaluate
     results_df, best_model_name, best_rmse, test_predictions = run_models(
-        processed_train_df, processed_test_df, RegressionModel()
+        processed_train_df, processed_test_df, models
     )
 
     # Display results
