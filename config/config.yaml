@@ -5,7 +5,7 @@ bots_and_scores:
 
 models:
   Linear Regression:
-    class: "Model.Models.regression_model.RegressionModel"
+    class: "model.models.regression_model.RegressionModel"
 
 cross_validation:
   cv_folds: 5

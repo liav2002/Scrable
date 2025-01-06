@@ -3,7 +3,7 @@ from typing import Dict
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import cross_validate
 from sklearn.base import BaseEstimator
-from Model.Models.base_model import BaseModel
+from model.models.base_model import BaseModel
 
 
 class RegressionModel(BaseModel, BaseEstimator):

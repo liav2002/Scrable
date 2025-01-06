@@ -56,8 +56,8 @@ def run_models_and_get_best(
         metrics = model_handler.evaluate(
             x, y, cv_folds=cv_folds, scoring=scoring, return_train_score=return_train_score
         )
-        logger.log(f"Model {model_name}: Metrics = {metrics}")
-        results.append({"Model": model_name, **metrics})
+        logger.log(f"model {model_name}: Metrics = {metrics}")
+        results.append({"model": model_name, **metrics})
 
     results_df = pd.DataFrame(results)
 
@@ -67,7 +67,7 @@ def run_models_and_get_best(
         raise ValueError(f"Best metric key '{best_metric_key}' is not in scoring metrics.")
 
     best_model_row = results_df.loc[results_df[best_metric_key].idxmin()]
-    best_model_name = best_model_row["Model"]
+    best_model_name = best_model_row["model"]
     best_model_handler = models[best_model_name]
 
     logger.log(f"Best model is {best_model_name} with {best_metric_key.upper()}: {best_model_row[best_metric_key]:.4f}")

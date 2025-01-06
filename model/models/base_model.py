@@ -68,6 +68,6 @@ class BaseModel(ABC):
         Set parameters for the model.
 
         Parameters:
-            **params: Model parameters to set.
+            **params: model parameters to set.
         """
         pass
