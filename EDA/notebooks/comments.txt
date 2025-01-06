@@ -1,6 +1,0 @@
-main_df - train & test - one line.
-user_df - train & test - human users only.
-bot_df - train & test - bot users only.
-
-train.csv - one line 
-games.csv - add bot difficulty
