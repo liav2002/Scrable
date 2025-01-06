@@ -182,3 +182,5 @@ data/preprocessed_data/new_turns.csv
 data/cleaned_data/cleaned_test.csv
 data/cleaned_data/cleaned_train.csv
 temp_files/
+EDA/notebooks/temp.ipynb
+EDA/notebooks/comments.txt
