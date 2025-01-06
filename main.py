@@ -4,7 +4,7 @@ from datetime import datetime
 from utils.data_loader import load_data
 from utils.config_loader import load_config
 from utils.logger import Logger, FileLogger
-from utils.model_manager import run_models, get_model_instance, train_and_predict
+from utils.model_manager import run_models_and_get_best, get_model_instance, train_and_predict_with_best
 from Model.Pipeline.pipeline import DataPipeline
 
 logger = Logger()
@@ -40,13 +40,13 @@ def main():
     logger.log("Models initialized.")
 
     # Run models and find the best model
-    results_df = run_models(processed_train_df, models, config, logger)
+    results_df, best_model = run_models_and_get_best(processed_train_df, models, config, logger)
     logger.log("Model evaluation completed.\n")
     logger.log("Model Performance Summary:")
     logger.log(results_df.to_string(index=False) + "\n")
 
     # Train and predict with the best model
-    test_predictions = train_and_predict(processed_train_df, processed_test_df, models, logger)
+    test_predictions = train_and_predict_with_best(processed_train_df, processed_test_df, best_model, logger)
     logger.log("First 10 predictions:")
     for idx, pred in enumerate(test_predictions[:10]):
         logger.log(f"Prediction {idx + 1}: {pred:.4f}")
