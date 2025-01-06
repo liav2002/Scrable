@@ -1,3 +1,4 @@
+import pyyaml
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from Model.Pipeline.pipeline import DataPipeline
@@ -8,10 +9,14 @@ def load_data():
     """
     Load source data from the data directory.
     """
-    train_df = pd.read_csv("data/source_data/train.csv")
-    test_df = pd.read_csv("data/source_data/test.csv")
-    games_df = pd.read_csv("data/source_data/games.csv")
-    turns_df = pd.read_csv("data/source_data/turns.csv")
+    with open("Config/file_paths.yaml", "r") as file:
+        paths = yaml.safe_load(file)["data_paths"]
+
+    train_df = pd.read_csv(paths["train"])
+    test_df = pd.read_csv(paths["test"])
+    games_df = pd.read_csv(paths["games"])
+    turns_df = pd.read_csv(paths["turns"])
+
     return train_df, test_df, games_df, turns_df
 
 
