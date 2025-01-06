@@ -174,5 +174,6 @@ data/
 logs/
 output/
 temp_files/
+EDA/output_EDA/
 EDA/notebooks/temp.ipynb
 EDA/notebooks/comments.txt
