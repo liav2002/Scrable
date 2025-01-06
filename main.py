@@ -1,11 +1,12 @@
 import pyyaml
 import pandas as pd
+from typing import Tuple
 from sklearn.model_selection import train_test_split
 from Model.Pipeline.pipeline import DataPipeline
 from Model.Models.regression_model import RegressionModel
 
 
-def load_data():
+def load_data() -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
     Load source data from the data directory.
     """
