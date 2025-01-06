@@ -28,11 +28,11 @@ def main():
     processed_test_df = pipeline.process_test_data(test_df)
 
     # Prepare training data
-    X = processed_train_df.drop(columns=["user_rating"])
+    x = processed_train_df.drop(columns=["user_rating"])
     y = processed_train_df["user_rating"]
 
     # Train-test split
-    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
+    x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.2, random_state=42)
 
     # Dictionary of models to evaluate
     models = {
@@ -43,8 +43,8 @@ def main():
     results = []
     for model_name, model_handler in models.items():
         print(f"Training and evaluating {model_name}...")
-        model_handler.fit(X_train, y_train)
-        metrics = model_handler.evaluate(X_val, y_val)
+        model_handler.fit(x_train, y_train)
+        metrics = model_handler.evaluate(x_val, y_val)
         results.append({
             "Model": model_name,
             **metrics
@@ -66,10 +66,10 @@ def main():
 
     # Train the best model on the entire training set and predict on test data
     best_model_handler = models[best_model_name]
-    best_model_handler.fit(X, y)
+    best_model_handler.fit(x, y)
 
-    X_test = processed_test_df.drop(columns=["user_rating"], errors="ignore")
-    test_predictions = best_model_handler.predict(X_test)
+    x_test = processed_test_df.drop(columns=["user_rating"], errors="ignore")
+    test_predictions = best_model_handler.predict(x_test)
 
     # Print sample predictions
     print("\nSample Test Predictions:")
