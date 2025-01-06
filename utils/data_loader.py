@@ -3,10 +3,8 @@ import pandas as pd
 from typing import Tuple
 from utils.logger import Logger
 
-logger = Logger()
 
-
-def load_data() -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def load_data(logger: Logger) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
     Load source data from the data directory.
 

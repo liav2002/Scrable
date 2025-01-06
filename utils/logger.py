@@ -1,6 +1,5 @@
 from typing import List
 
-
 class Logger:
     """
     A simple logger using the Observer design pattern.
@@ -20,7 +19,13 @@ class Logger:
             observer.update(message)
 
     def log(self, message: str):
-        print(message)  # Print to console
+        """
+        Log a message to console and notify observers.
+
+        Args:
+            message (str): The message to log.
+        """
+        print(message)
         self.notify(message)
 
 

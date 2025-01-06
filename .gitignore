@@ -172,6 +172,7 @@ cython_debug/
 
 data/
 logs/
+output/
 temp_files/
 EDA/notebooks/temp.ipynb
 EDA/notebooks/comments.txt

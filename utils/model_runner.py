@@ -2,9 +2,6 @@ import importlib
 import pandas as pd
 from utils.logger import Logger
 
-logger = Logger()
-
-
 def get_model_instance(model_class_path: str):
     """
     Dynamically load a model class and return its instance.
@@ -21,27 +18,23 @@ def get_model_instance(model_class_path: str):
 
 
 def run_models(
-    train_df: pd.DataFrame,
-    test_df: pd.DataFrame,
-    models: dict,
-    config: dict,
-) -> tuple:
+        train_df: pd.DataFrame,
+        models: dict,
+        config: dict,
+        logger: Logger
+) -> pd.DataFrame:
     """
     Train and evaluate multiple models using their respective evaluate methods,
     and determine the best model by a configurable metric.
 
     Args:
+        logger: (Logger): logger object.
         train_df (pd.DataFrame): Processed training data.
-        test_df (pd.DataFrame): Processed test data.
         models (dict): A dictionary of models to evaluate.
         config (dict): Configuration dictionary.
 
     Returns:
-        tuple: A tuple containing:
-            - results_df (pd.DataFrame): DataFrame summarizing model results.
-            - best_model_name (str): Name of the best model.
-            - best_metric_value (float): Value of the best metric.
-            - test_predictions (list): Predictions on the test dataset by the best model.
+        pd.DataFrame: DataFrame summarizing model results.
     """
     # Load cross-validation parameters from config
     cv_config = config["cross_validation"]
@@ -72,16 +65,56 @@ def run_models(
 
     best_model_row = results_df.loc[results_df[best_metric_key].idxmin()]
     best_model_name = best_model_row["Model"]
-    best_metric_value = best_model_row[best_metric_key]
 
-    logger.log(f"Best model is {best_model_name} with {best_metric_key.upper()}: {best_metric_value:.4f}")
+    # Save the best model name to an output file
+    with open("output/best_model.txt", "w") as file:
+        file.write(best_model_name)
 
-    # Train the best model on the full training data
-    best_model_handler = models[best_model_name]
+    logger.log(f"Best model is {best_model_name} with {best_metric_key.upper()}: {best_model_row[best_metric_key]:.4f}")
+
+    return results_df
+
+
+def train_and_predict(
+        train_df: pd.DataFrame,
+        test_df: pd.DataFrame,
+        models: dict,
+        logger: Logger,
+) -> list:
+    """
+    Train the best model on the entire training data and predict on the test data.
+
+    Args:
+        logger (Logger): logger object.
+        train_df (pd.DataFrame): Processed training data.
+        test_df (pd.DataFrame): Processed test data.
+        models (dict): A dictionary of models to evaluate.
+
+    Returns:
+        list: Predictions on the test dataset by the best model.
+    """
+    # Load the best model name from the output file
+    try:
+        with open("output/best_model.txt", "r") as file:
+            best_model_name = file.read().strip()
+    except FileNotFoundError:
+        logger.log("Error: Best model file not found. Run 'run_models' first.")
+        raise ValueError("Best model file not found. Run 'run_models' first.")
+
+    # Get the best model
+    best_model_handler = models.get(best_model_name)
+    if not best_model_handler:
+        logger.log(f"Error: Best model '{best_model_name}' not found in models dictionary.")
+        raise ValueError(f"Best model '{best_model_name}' not found in models dictionary.")
+
+    logger.log(f"Training the best model '{best_model_name}' on the full training data...\n")
+    x = train_df.drop(columns=["user_rating"])
+    y = train_df["user_rating"]
     best_model_handler.fit(x, y)
 
     # Predict on the test data
+    logger.log("Making predictions on the test data...")
     x_test = test_df.drop(columns=["user_rating"], errors="ignore")
     test_predictions = best_model_handler.predict(x_test)
 
-    return results_df, best_model_name, best_metric_value, test_predictions
+    return test_predictions

@@ -4,7 +4,7 @@ from datetime import datetime
 from utils.data_loader import load_data
 from utils.config_loader import load_config
 from utils.logger import Logger, FileLogger
-from utils.model_runner import run_models, get_model_instance
+from utils.model_runner import run_models, get_model_instance, train_and_predict
 from Model.Pipeline.pipeline import DataPipeline
 
 logger = Logger()
@@ -14,11 +14,8 @@ def main():
     """
     Entry point for the application.
     """
-    # Generate runtime signature for the log file
     runtime_signature = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     log_file_path = f"logs/{runtime_signature}.log"
-
-    # Attach a file logger
     file_logger = FileLogger(log_file_path)
     logger.subscribe(file_logger)
 
@@ -26,7 +23,7 @@ def main():
     config = load_config()
     logger.log("Configuration loaded.\n")
 
-    train_df, test_df, games_df, turns_df = load_data()
+    train_df, test_df, games_df, turns_df = load_data(logger)
     logger.log("Data loaded successfully.\n")
 
     pipeline = DataPipeline(config["bots_and_scores"], turns_df, games_df)
@@ -35,29 +32,26 @@ def main():
     processed_test_df = pipeline.process_test_data(test_df)
     logger.log("Data processing completed.\n")
 
+    # Define models to evaluate
     models = {
         model_name: get_model_instance(model_details["class"])
         for model_name, model_details in config["models"].items()
     }
     logger.log("Models initialized.")
 
-    results_df, best_model_name, best_rmse, test_predictions = run_models(
-        processed_train_df, processed_test_df, models, config
-    )
-    logger.log("Model evaluation completed.")
+    # Run models and find the best model
+    results_df = run_models(processed_train_df, models, config, logger)
+    logger.log("Model evaluation completed.\n")
+    logger.log("Model Performance Summary:")
+    logger.log(results_df.to_string(index=False) + "\n")
 
-    print("\nModel Performance Summary:")
-    print(results_df.to_string(index=False))
-    logger.log(f"Best Model: {best_model_name} with RMSE: {best_rmse:.4f}")
-
-    # Print first 10 predictions
-    logger.log("\nPrinting first 10 predictions from the test data...")
-    print("First 10 Test Predictions:")
+    # Train and predict with the best model
+    test_predictions = train_and_predict(processed_train_df, processed_test_df, models, logger)
+    logger.log("First 10 predictions:")
     for idx, pred in enumerate(test_predictions[:10]):
-        print(f"Prediction {idx + 1}: {pred:.4f}")
         logger.log(f"Prediction {idx + 1}: {pred:.4f}")
 
-    logger.log("\nApplication completed.")
+    logger.log("Application completed.")
 
 
 if __name__ == "__main__":
