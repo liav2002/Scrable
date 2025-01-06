@@ -6,6 +6,21 @@ from Model.Pipeline.pipeline import DataPipeline
 from Model.Models.regression_model import RegressionModel
 
 
+def load_config(file_path: str = "Config/config.yaml") -> dict:
+    """
+    Load the configuration file.
+
+    Args:
+        file_path (str): Path to the YAML configuration file.
+
+    Returns:
+        dict: Configuration data as a dictionary.
+    """
+    with open(file_path, "r") as file:
+        config = yaml.safe_load(file)
+    return config
+
+
 def load_data() -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
     Load source data from the data directory.
@@ -30,7 +45,8 @@ def load_data() -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]
 
 
 def main():
-    bots_and_scores = {"BetterBot": 268240632, "STEEBot": 276067680, "HastyBot": 588506671}
+    config = load_config()
+    bots_and_scores = config["bots_and_scores"]
     train_df, test_df, games_df, turns_df = load_data()
 
     # Create pipeline
