@@ -4,7 +4,7 @@ from datetime import datetime
 from utils.data_loader import load_data
 from utils.config_loader import load_config
 from utils.logger import Logger, FileLogger
-from utils.model_runner import run_models, get_model_instance, train_and_predict
+from utils.model_manager import run_models, get_model_instance, train_and_predict
 from Model.Pipeline.pipeline import DataPipeline
 
 logger = Logger()
