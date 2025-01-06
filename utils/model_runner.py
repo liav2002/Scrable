@@ -1,7 +1,6 @@
 import importlib
 import pandas as pd
 from utils.logger import Logger
-from sklearn.model_selection import train_test_split
 
 logger = Logger()
 
@@ -22,13 +21,14 @@ def get_model_instance(model_class_path: str):
 
 
 def run_models(
-        train_df: pd.DataFrame,
-        test_df: pd.DataFrame,
-        models: dict,
-        config: dict,
+    train_df: pd.DataFrame,
+    test_df: pd.DataFrame,
+    models: dict,
+    config: dict,
 ) -> tuple:
     """
-    Train and evaluate multiple models, and determine the best model by RMSE.
+    Train and evaluate multiple models using their respective evaluate methods,
+    and determine the best model by a configurable metric.
 
     Args:
         train_df (pd.DataFrame): Processed training data.
@@ -40,37 +40,48 @@ def run_models(
         tuple: A tuple containing:
             - results_df (pd.DataFrame): DataFrame summarizing model results.
             - best_model_name (str): Name of the best model.
-            - best_rmse (float): RMSE score of the best model.
+            - best_metric_value (float): Value of the best metric.
             - test_predictions (list): Predictions on the test dataset by the best model.
     """
-    split_config = config["train_test_split"]
-    test_size = split_config["test_size"]
-    random_state = split_config["random_state"]
+    # Load cross-validation parameters from config
+    cv_config = config["cross_validation"]
+    cv_folds = cv_config["cv_folds"]
+    scoring = cv_config["scoring"]
+    return_train_score = cv_config["return_train_score"]
+    best_metric_key = cv_config["best_metric_key"]
 
-    logger.log("Preparing training and validation data...")
+    logger.log("Preparing training data...")
     x = train_df.drop(columns=["user_rating"])
     y = train_df["user_rating"]
-    x_train, x_val, y_train, y_val = train_test_split(
-        x, y, test_size=test_size, random_state=random_state
-    )
 
     results = []
     for model_name, model_handler in models.items():
-        logger.log(f"Training and evaluating {model_name}...")
-        model_handler.fit(x_train, y_train)
-        metrics = model_handler.evaluate(x_val, y_val)
+        logger.log(f"Evaluating {model_name} with {cv_folds} folds...")
+        metrics = model_handler.evaluate(
+            x, y, cv_folds=cv_folds, scoring=scoring, return_train_score=return_train_score
+        )
+        logger.log(f"Model {model_name}: Metrics = {metrics}")
         results.append({"Model": model_name, **metrics})
 
     results_df = pd.DataFrame(results)
-    best_model_row = results_df.loc[results_df["RMSE"].idxmin()]
-    best_model_name = best_model_row["Model"]
-    best_rmse = best_model_row["RMSE"]
 
-    logger.log(f"Best model is {best_model_name} with RMSE: {best_rmse:.4f}")
+    # Find the best model using the configurable metric
+    if best_metric_key not in scoring:
+        logger.log(f"Error: Best metric key '{best_metric_key}' is not in scoring metrics.")
+        raise ValueError(f"Best metric key '{best_metric_key}' is not in scoring metrics.")
+
+    best_model_row = results_df.loc[results_df[best_metric_key].idxmin()]
+    best_model_name = best_model_row["Model"]
+    best_metric_value = best_model_row[best_metric_key]
+
+    logger.log(f"Best model is {best_model_name} with {best_metric_key.upper()}: {best_metric_value:.4f}")
+
+    # Train the best model on the full training data
     best_model_handler = models[best_model_name]
     best_model_handler.fit(x, y)
 
+    # Predict on the test data
     x_test = test_df.drop(columns=["user_rating"], errors="ignore")
     test_predictions = best_model_handler.predict(x_test)
 
-    return results_df, best_model_name, best_rmse, test_predictions
+    return results_df, best_model_name, best_metric_value, test_predictions

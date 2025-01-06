@@ -7,6 +7,10 @@ models:
   Linear Regression:
     class: "Model.Models.regression_model.RegressionModel"
 
-train_test_split:
-  test_size: 0.2
-  random_state: 42
+cross_validation:
+  cv_folds: 5
+  scoring:
+    rmse: "neg_root_mean_squared_error"
+    mae: "neg_mean_absolute_error"
+  return_train_score: true
+  best_metric_key: "rmse"

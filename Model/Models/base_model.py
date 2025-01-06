@@ -33,15 +33,41 @@ class BaseModel(ABC):
         pass
 
     @abstractmethod
-    def evaluate(self, X, y) -> Dict[str, Any]:
+    def evaluate(self, X, y, cv_folds: int, scoring: Dict[str, str], return_train_score: bool) -> Dict[str, float]:
         """
-        Evaluate the model on the given data.
+        Evaluate the model using cross-validation.
 
         Parameters:
             X (DataFrame): Features for evaluation.
             y (Series): True target values.
+            cv_folds (int): Number of cross-validation folds.
+            scoring (Dict[str, str]): Scoring metrics for evaluation.
+            return_train_score (bool): Whether to return train scores.
 
         Returns:
-            dict: A dictionary containing evaluation metrics.
+            dict: A dictionary containing cross-validation metrics.
+        """
+        pass
+
+    @abstractmethod
+    def get_params(self, deep: bool = True) -> Dict:
+        """
+        Get parameters for the model.
+
+        Parameters:
+            deep (bool): Whether to include nested parameters.
+
+        Returns:
+            dict: A dictionary of parameters.
+        """
+        pass
+
+    @abstractmethod
+    def set_params(self, **params) -> None:
+        """
+        Set parameters for the model.
+
+        Parameters:
+            **params: Model parameters to set.
         """
         pass

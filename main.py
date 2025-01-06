@@ -24,16 +24,16 @@ def main():
 
     logger.log("Application started.")
     config = load_config()
-    logger.log("Configuration loaded.")
+    logger.log("Configuration loaded.\n")
 
     train_df, test_df, games_df, turns_df = load_data()
-    logger.log("Data loaded successfully.")
+    logger.log("Data loaded successfully.\n")
 
     pipeline = DataPipeline(config["bots_and_scores"], turns_df, games_df)
     logger.log("Pipeline initialized.")
     processed_train_df = pipeline.process_train_data(train_df)
     processed_test_df = pipeline.process_test_data(test_df)
-    logger.log("Data processing completed.")
+    logger.log("Data processing completed.\n")
 
     models = {
         model_name: get_model_instance(model_details["class"])
@@ -50,7 +50,14 @@ def main():
     print(results_df.to_string(index=False))
     logger.log(f"Best Model: {best_model_name} with RMSE: {best_rmse:.4f}")
 
-    logger.log("Application completed.")
+    # Print first 10 predictions
+    logger.log("\nPrinting first 10 predictions from the test data...")
+    print("First 10 Test Predictions:")
+    for idx, pred in enumerate(test_predictions[:10]):
+        print(f"Prediction {idx + 1}: {pred:.4f}")
+        logger.log(f"Prediction {idx + 1}: {pred:.4f}")
+
+    logger.log("\nApplication completed.")
 
 
 if __name__ == "__main__":
