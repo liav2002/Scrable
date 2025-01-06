@@ -3,7 +3,6 @@ from utils.data_loader import load_data
 from utils.config_loader import load_config
 from utils.model_runner import run_models, get_model_instance
 from Model.Pipeline.pipeline import DataPipeline
-from Model.Models.regression_model import RegressionModel
 
 
 def main():
