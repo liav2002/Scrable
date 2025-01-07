@@ -6,6 +6,10 @@ bots_and_scores:
 models:
   Linear Regression:
     class: "model.models.regression_model.RegressionModel"
+  XGBoost:
+    class: "model.models.xgboost_model.XGBoostModel"
+  Neural Network:
+    class: "model.models.neural_network_model.NeuralNetworkModel"
 
 cross_validation:
   cv_folds: 5
