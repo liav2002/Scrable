@@ -1,5 +1,6 @@
 import optuna
 import pandas as pd
+from typing import Dict
 from xgboost import XGBRegressor
 from sklearn.model_selection import cross_validate
 from model.models.base_model import BaseModel
@@ -72,28 +73,35 @@ class XGBoostModel(BaseModel):
 
         return metrics
 
-    def search_best_params(self, X: pd.DataFrame, y: pd.Series, logger, config: dict) -> dict:
+    def search_best_params(self, X: pd.DataFrame, y: pd.Series, config: dict) -> dict:
         """
         Perform hyperparameter tuning for the XGBoost model using Optuna.
 
         Args:
             X (pd.DataFrame): Feature matrix for training.
             y (pd.Series): Target variable for training.
-            logger: Logger instance to log the tuning process.
             config (dict): Hyperparameter tuning configuration.
 
         Returns:
             dict: Best parameters found via hyperparameter tuning.
         """
+        # Parse relevant configurations for hyperparameter tuning
         search_space = config["hyperparameter_tuning"]["xgboost_search_space"]
+        learning_rate_range = list(map(float, search_space["learning_rate_range"]))
+        max_depth_range = search_space["max_depth"]
+        n_estimators_range = search_space["n_estimators_range"]
+        subsample_range = search_space["subsample_range"]
+        colsample_bytree_range = search_space["colsample_bytree_range"]
 
         def objective(trial):
-            max_depth = trial.suggest_int("max_depth", *search_space["max_depth"])
-            learning_rate = trial.suggest_loguniform("learning_rate", *search_space["learning_rate_range"])
-            n_estimators = trial.suggest_int("n_estimators", *search_space["n_estimators_range"])
-            subsample = trial.suggest_uniform("subsample", *search_space["subsample_range"])
-            colsample_bytree = trial.suggest_uniform("colsample_bytree", *search_space["colsample_bytree_range"])
+            # Suggest hyperparameters from the search space
+            max_depth = trial.suggest_int("max_depth", *max_depth_range)
+            learning_rate = trial.suggest_float("learning_rate", *learning_rate_range, log=True)
+            n_estimators = trial.suggest_int("n_estimators", *n_estimators_range)
+            subsample = trial.suggest_float("subsample", *subsample_range)
+            colsample_bytree = trial.suggest_float("colsample_bytree", *colsample_bytree_range)
 
+            # Build the model with suggested hyperparameters
             model = XGBRegressor(
                 max_depth=max_depth,
                 learning_rate=learning_rate,
@@ -103,16 +111,24 @@ class XGBoostModel(BaseModel):
                 random_state=42,
             )
 
-            scores = cross_validate(model, X, y, cv=config["cross_validation"]["cv_folds"],
-                                    scoring="neg_root_mean_squared_error")
-            return -scores.mean()
+            # Perform cross-validation and evaluate
+            scores = cross_validate(
+                model,
+                X,
+                y,
+                cv=config["cross_validation"]["cv_folds"],
+                scoring=config["cross_validation"]["scoring"]["rmse"],
+                return_train_score=config["cross_validation"]["return_train_score"]
+            )
 
-        logger.log("Starting hyperparameter search for XGBoostModel.")
+            # Return the mean of the test scores (neg RMSE)
+            return -scores["test_score"].mean()
+
         study = optuna.create_study(direction="minimize")
         study.optimize(objective, n_trials=config["hyperparameter_tuning"]["trials"])
         self.best_params = study.best_params
-        logger.log(f"Best params for XGBoostModel: {self.best_params}")
 
+        # Update the model with the best parameters
         self.model.set_params(**self.best_params)
         return self.best_params
 

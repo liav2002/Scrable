@@ -49,13 +49,34 @@ class Solver:
         self.logger.log("Data processing completed.")
 
         # Define models to evaluate
-        models = {
-            model_name: get_model_instance(
-                model_details["class"],
-                model_details["params"]
-            )
-            for model_name, model_details in self.config["models"].items()
-        }
+        models = {}
+        if self.config["hyperparameter_tuning"]["search_best_params"]:
+            self.logger.log("Performing hyperparameter tuning for all models.")
+            for model_name, model_details in self.config["models"].items():
+                model = get_model_instance(
+                    model_details["class"],
+                    model_details["params"]
+                )
+                if hasattr(model, "search_best_params"):
+                    self.logger.log(f"Starting hyperparameter tuning for {model_name}.")
+                    best_params = model.search_best_params(
+                        processed_train_df.drop(columns=["user_rating"]),
+                        processed_train_df["user_rating"],
+                        self.config
+                    )
+                    self.logger.log(f"Best parameters for {model_name}: {best_params}")
+                    model_details["params"] = best_params
+                models[model_name] = model
+        else:
+            self.logger.log("Using predefined model parameters from configuration.")
+            models = {
+                model_name: get_model_instance(
+                    model_details["class"],
+                    model_details["params"]
+                )
+                for model_name, model_details in self.config["models"].items()
+            }
+
         self.logger.log("Models initialized.")
 
         # Run models and find the best model

@@ -9,6 +9,7 @@ def get_model_instance(model_class_path: str, params: dict = None):
 
     Args:
         model_class_path (str): The full path of the model class (e.g., "module.submodule.ClassName").
+        params (dict): Model parameters to initialize the instance.
 
     Returns:
         object: An instance of the specified model class.

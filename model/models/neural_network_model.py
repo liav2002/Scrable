@@ -1,5 +1,6 @@
 import optuna
 import pandas as pd
+from typing import Dict
 from sklearn.neural_network import MLPRegressor
 from sklearn.model_selection import cross_validate
 from model.models.base_model import BaseModel
@@ -60,47 +61,62 @@ class NeuralNetworkModel(BaseModel):
 
         return metrics
 
-    def search_best_params(self, X: pd.DataFrame, y: pd.Series, logger, config: dict) -> dict:
+    def search_best_params(self, X: pd.DataFrame, y: pd.Series, config: dict) -> dict:
         """
         Perform hyperparameter tuning for the Neural Network model using Optuna.
 
         Args:
             X (pd.DataFrame): Feature matrix for training.
             y (pd.Series): Target variable for training.
-            logger: Logger instance to log the tuning process.
             config (dict): Hyperparameter tuning configuration.
 
         Returns:
             dict: Best parameters found via hyperparameter tuning.
         """
+        # Parse relevant configurations for hyperparameter tuning
         search_space = config["hyperparameter_tuning"]["neural_network_search_space"]
+        hidden_layer_sizes_options = search_space["hidden_layer_sizes"]
+        activation_options = search_space["activation"]
+        learning_rate_init_range = list(map(float, search_space["learning_rate_init_range"]))
 
         def objective(trial):
+            # Suggest hyperparameters from the search space
             hidden_layer_sizes = tuple(
-                trial.suggest_categorical("hidden_layer_sizes", search_space["hidden_layer_sizes"]))
-            activation = trial.suggest_categorical("activation", search_space["activation"])
-            learning_rate_init = trial.suggest_loguniform("learning_rate_init",
-                                                          *search_space["learning_rate_init_range"])
+                trial.suggest_categorical("hidden_layer_sizes", hidden_layer_sizes_options)
+            )
+            activation = trial.suggest_categorical("activation", activation_options)
+            learning_rate_init = trial.suggest_float(
+                "learning_rate_init", *learning_rate_init_range, log=True
+            )
 
+            # Build the model with suggested hyperparameters
             model = MLPRegressor(
                 hidden_layer_sizes=hidden_layer_sizes,
                 activation=activation,
-                solver="adam",
+                solver=config["models"]["Neural Network"]["params"]["solver"],
                 learning_rate_init=learning_rate_init,
-                max_iter=300,
-                random_state=42,
+                max_iter=config["models"]["Neural Network"]["params"]["max_iter"],
+                random_state=config["models"]["Neural Network"]["params"]["random_state"],
             )
 
-            scores = cross_validate(model, X, y, cv=config["cross_validation"]["cv_folds"],
-                                    scoring="neg_root_mean_squared_error")
-            return -scores.mean()
+            # Perform cross-validation and evaluate
+            scores = cross_validate(
+                model,
+                X,
+                y,
+                cv=config["cross_validation"]["cv_folds"],
+                scoring=config["cross_validation"]["scoring"]["rmse"],
+                return_train_score=config["cross_validation"]["return_train_score"]
+            )
 
-        logger.log("Starting hyperparameter search for NeuralNetworkModel.")
+            # Return the mean of the test scores (neg RMSE)
+            return -scores["test_score"].mean()
+
         study = optuna.create_study(direction="minimize")
         study.optimize(objective, n_trials=config["hyperparameter_tuning"]["trials"])
         self.best_params = study.best_params
-        logger.log(f"Best params for NeuralNetworkModel: {self.best_params}")
 
+        # Update the model with the best parameters
         self.model.set_params(**self.best_params)
         return self.best_params
 

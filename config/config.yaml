@@ -10,31 +10,31 @@ models:
   XGBoost:
     class: "model.models.xgboost_model.XGBoostModel"
     params:
-      n_estimators: 200
-      max_depth: 8
-      learning_rate: 0.05
-      subsample: 0.9
-      colsample_bytree: 0.9
+      n_estimators: 291
+      max_depth: 10
+      learning_rate: 0.017144109417060908
+      subsample: 0.9007674152662399
+      colsample_bytree: 0.7941578206631733
       random_state: 42
   Neural Network:
     class: "model.models.neural_network_model.NeuralNetworkModel"
     params:
-      hidden_layer_sizes: [128, 64]
+      hidden_layer_sizes: [64, 32]
       activation: "tanh"
       solver: "adam"
-      learning_rate_init: 0.0005
+      learning_rate_init: 0.020267548486620213
       max_iter: 300
       random_state: 42
 
 hyperparameter_tuning:
-  search_best_params: false  # Set to true to enable hyperparameter tuning
-  trials: 50
+  search_best_params: false
+  trials: 5
   neural_network_search_space:
     hidden_layer_sizes: [[128, 64], [64, 32], [128, 64, 32]]
     activation: ["relu", "tanh"]
     learning_rate_init_range: [1e-5, 1e-1]
   xgboost_search_space:
-    max_depth: [3, 10]  # Min and max depth
+    max_depth: [3, 10]
     learning_rate_range: [1e-4, 1e-1]
     n_estimators_range: [100, 500]
     subsample_range: [0.5, 1.0]
