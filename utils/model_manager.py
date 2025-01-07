@@ -3,7 +3,7 @@ import pandas as pd
 from utils.logger import Logger
 
 
-def get_model_instance(model_class_path: str):
+def get_model_instance(model_class_path: str, params: dict = None):
     """
     Dynamically load a model class and return its instance.
 
@@ -15,7 +15,8 @@ def get_model_instance(model_class_path: str):
     """
     module_name, class_name = model_class_path.rsplit(".", 1)
     module = importlib.import_module(module_name)
-    return getattr(module, class_name)()
+    model_class = getattr(module, class_name)
+    return model_class(**(params or {}))
 
 
 def run_models_and_get_best(

@@ -10,11 +10,11 @@ class NeuralNetworkModel(BaseModel):
     Neural Network model implementation.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **params):
         """
         Initialize the Neural Network model with parameters for MLPRegressor.
         """
-        self.model = MLPRegressor(**kwargs)
+        self.model = MLPRegressor(**params)
 
     def fit(self, X, y) -> None:
         """

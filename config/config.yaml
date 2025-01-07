@@ -6,10 +6,25 @@ bots_and_scores:
 models:
   Linear Regression:
     class: "model.models.regression_model.RegressionModel"
+    params: {}
   XGBoost:
     class: "model.models.xgboost_model.XGBoostModel"
+    params:
+      n_estimators: 200
+      max_depth: 8
+      learning_rate: 0.05
+      subsample: 0.9
+      colsample_bytree: 0.9
+      random_state: 42
   Neural Network:
     class: "model.models.neural_network_model.NeuralNetworkModel"
+    params:
+      hidden_layer_sizes: [ 128, 64 ]
+      activation: "tanh"
+      solver: "adam"
+      learning_rate_init: 0.0005
+      max_iter: 300
+      random_state: 42
 
 cross_validation:
   cv_folds: 5

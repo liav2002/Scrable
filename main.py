@@ -34,7 +34,10 @@ def main():
 
     # Define models to evaluate
     models = {
-        model_name: get_model_instance(model_details["class"])
+        model_name: get_model_instance(
+            model_details["class"],
+            model_details["params"]
+        )
         for model_name, model_details in config["models"].items()
     }
     logger.log("models initialized.")

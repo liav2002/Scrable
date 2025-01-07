@@ -10,11 +10,11 @@ class XGBoostModel(BaseModel):
     XGBoost model implementation.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **params):
         """
         Initialize the XGBoost model with parameters.
         """
-        self.model = XGBRegressor(**kwargs)
+        self.model = XGBRegressor(**params)
 
     def fit(self, X, y) -> None:
         """
