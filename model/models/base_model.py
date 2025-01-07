@@ -71,16 +71,3 @@ class BaseModel(ABC):
             **params: model parameters to set.
         """
         pass
-
-    @abstractmethod
-    def search_best_params(self, X: pd.DataFrame, y: pd.Series, logger) -> Dict:
-        """
-        Perform hyperparameter tuning using Optuna.
-        Args:
-            X (pd.DataFrame): Feature matrix for training.
-            y (pd.Series): Target variable for training.
-            logger: Logger instance to log the tuning process.
-        Returns:
-            dict: Best parameters found via hyperparameter tuning.
-        """
-        pass
