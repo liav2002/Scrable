@@ -2,10 +2,10 @@ import yaml
 import pandas as pd
 from typing import Tuple
 
-from src.utils.logger import Logger
+from src.utils.logger import logger
 
 
-def load_data(logger: Logger) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def load_data() -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
     Load source data from the data directory.
 

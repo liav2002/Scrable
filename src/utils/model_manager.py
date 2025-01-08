@@ -1,7 +1,7 @@
 import importlib
 import pandas as pd
 
-from src.utils.logger import Logger
+from src.utils.logger import logger
 
 
 def get_model_instance(model_class_path: str, params: dict = None):
@@ -24,15 +24,13 @@ def get_model_instance(model_class_path: str, params: dict = None):
 def run_models_and_get_best(
         train_df: pd.DataFrame,
         models: dict,
-        config: dict,
-        logger: Logger
+        config: dict
 ) -> tuple:
     """
     Train and evaluate multiple models using their respective evaluate methods,
     and determine the best model by a configurable metric.
 
     Args:
-        logger (Logger): Logger object.
         train_df (pd.DataFrame): Processed training data.
         models (dict): A dictionary of models to evaluate.
         config (dict): Configuration dictionary.
@@ -81,8 +79,7 @@ def run_models_and_get_best(
 def train_and_predict_with_best(
         train_df: pd.DataFrame,
         test_df: pd.DataFrame,
-        best_model_handler,
-        logger: Logger
+        best_model_handler
 ) -> list:
     """
     Train the best model on the entire training data and predict on the test data.
@@ -91,7 +88,6 @@ def train_and_predict_with_best(
         train_df (pd.DataFrame): Processed training data.
         test_df (pd.DataFrame): Processed test data.
         best_model_handler: The best model instance.
-        logger (Logger): Logger object.
 
     Returns:
         list: Predictions on the test dataset by the best model.
