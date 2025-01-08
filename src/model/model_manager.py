@@ -1,26 +1,6 @@
-import importlib
 import pandas as pd
 
 from src.utils.logger import logger
-from src.model.models.base_model import BaseModel
-
-
-def get_model_instance(model_class_path: str, params: dict = None) -> BaseModel:
-    """
-    Dynamically load a model class and return its instance.
-
-    Args:
-        model_class_path (str): The full path of the model class (e.g., "module.submodule.ClassName").
-        params (dict): Model parameters to initialize the instance.
-
-    Returns:
-        object: An instance of the specified model class.
-                 The return type depends on the model class being dynamically loaded.
-    """
-    module_name, class_name = model_class_path.rsplit(".", 1)
-    module = importlib.import_module(module_name)
-    model_class = getattr(module, class_name)
-    return model_class(**(params or {}))
 
 
 def run_models_and_get_best(
@@ -34,13 +14,13 @@ def run_models_and_get_best(
 
     Args:
         train_df (pd.DataFrame): Processed training data.
-        models (dict): A dictionary of models to evaluate.
+        models (dict): A dictionary of ModelHandler instances to evaluate.
         config (dict): Configuration dictionary.
 
     Returns:
         tuple:
             pd.DataFrame: DataFrame summarizing model results.
-            object: The best model instance.
+            ModelHandler: The best model handler instance.
     """
     # Load cross-validation parameters from config
     cv_config = config["cross_validation"]
@@ -56,19 +36,23 @@ def run_models_and_get_best(
     results = []
     for model_name, model_handler in models.items():
         logger.log(f"Evaluating {model_name} with {cv_folds} folds...")
+
+        # Call the evaluate method of the ModelHandler
         metrics = model_handler.evaluate(
             x, y, cv_folds=cv_folds, scoring=scoring, return_train_score=return_train_score
         )
-        logger.log(f"model {model_name}: Metrics = {metrics}")
+
+        logger.log(f"Model {model_name}: Metrics = {metrics}")
         results.append({"model": model_name, **metrics})
 
     results_df = pd.DataFrame(results)
 
-    # Find the best model using the configurable metric
+    # Validate the best metric key exists in the scoring metrics
     if best_metric_key not in scoring:
         logger.log(f"Error: Best metric key '{best_metric_key}' is not in scoring metrics.")
         raise ValueError(f"Best metric key '{best_metric_key}' is not in scoring metrics.")
 
+    # Identify the best model using the best metric key
     best_model_row = results_df.loc[results_df[best_metric_key].idxmin()]
     best_model_name = best_model_row["model"]
     best_model_handler = models[best_model_name]
