@@ -1,10 +1,12 @@
 from typing import List
 
+
 class Logger:
     """
     A simple logger using the Observer design pattern.
     Observers subscribe to receive log messages.
     """
+
     def __init__(self):
         self.observers: List = []
 
@@ -33,6 +35,7 @@ class FileLogger:
     """
     Logs messages to a file.
     """
+
     def __init__(self, file_path: str):
         self.file_path = file_path
 
