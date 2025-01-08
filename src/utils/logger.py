@@ -37,5 +37,14 @@ class FileLogger:
         self.file_path = file_path
 
     def update(self, message: str):
+        """
+        Append a log message to the log file.
+
+        Args:
+            message (str): The log message to be written to the log file.
+
+        Raises:
+            IOError: If there is an issue writing to the log file.
+        """
         with open(self.file_path, "a") as log_file:
             log_file.write(message + "\n")
