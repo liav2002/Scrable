@@ -116,7 +116,9 @@ class Solver:
         if not os.path.exists(self.best_model_path):
             logger.log(
                 f"Error: Best model file '{self.best_model_path}' not found. Please run 'find_best_model' first.")
-            return
+            raise FileNotFoundError(
+                f"Best model file '{self.best_model_path}' not found. Please run 'find_best_model' first."
+            )
 
         # Load the best model from pickle
         logger.log(f"Loading the best model from {self.best_model_path}.")
