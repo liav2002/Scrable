@@ -38,11 +38,11 @@ class ReorderColumns(AbstractTransformer):
         Returns:
         dict: Updated data dictionary with reordered `train_df`.
         """
-        train_df = data["train_df"].copy()
+        train_df = data["train_df"]
 
         if self.target_column in train_df.columns:
             columns = [col for col in train_df.columns if col != self.target_column]
-            train_df = train_df[columns + [self.target_column]]
+            data["train_df"] = train_df[columns + [self.target_column]]
 
-        data["train_df"] = train_df
         return data
+
