@@ -2,9 +2,9 @@ import os
 import pickle
 from datetime import datetime
 
-from utils.data_loader import load_data
 from utils.config_loader import load_config
 from utils.logger import Logger, FileLogger
+from utils.data_loader import load_data, load_best_model_path
 from utils.model_manager import run_models_and_get_best, get_model_instance
 
 from model.pipeline.pipeline import DataPipeline
@@ -21,7 +21,7 @@ class Solver:
         self.test_df = None
         self.games_df = None
         self.turns_df = None
-        self.best_model_path = "./output/best_model.pkl"
+        self.best_model_path = None
         self._setup()
 
     def _setup(self):
@@ -39,6 +39,9 @@ class Solver:
 
         self.train_df, self.test_df, self.games_df, self.turns_df = load_data(self.logger)
         self.logger.log("Data loaded successfully.")
+
+        self.best_model_path = load_best_model_path()
+        self.logger.log("Best model will be saved on: " + self.best_model_path)
 
     def find_best_model(self):
         """

@@ -3,3 +3,6 @@ data_paths:
   test: "data/source_data/test.csv"
   games: "data/source_data/games.csv"
   turns: "data/source_data/turns.csv"
+
+output_path:
+  best_model: "output/best_model.pkl"
