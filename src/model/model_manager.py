@@ -2,9 +2,10 @@ import importlib
 import pandas as pd
 
 from src.utils.logger import logger
+from src.model.models.base_model import BaseModel
 
 
-def get_model_instance(model_class_path: str, params: dict = None):
+def get_model_instance(model_class_path: str, params: dict = None) -> BaseModel:
     """
     Dynamically load a model class and return its instance.
 
@@ -14,6 +15,7 @@ def get_model_instance(model_class_path: str, params: dict = None):
 
     Returns:
         object: An instance of the specified model class.
+                 The return type depends on the model class being dynamically loaded.
     """
     module_name, class_name = model_class_path.rsplit(".", 1)
     module = importlib.import_module(module_name)
