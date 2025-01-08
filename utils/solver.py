@@ -15,13 +15,8 @@ class Solver:
         """
         Initialize the Solver class with necessary configurations and logger setup.
         """
+        self.config = self.train_df = self.test_df = self.games_df = self.turns_df = self.best_model_path = None
         self.logger = Logger()
-        self.config = None
-        self.train_df = None
-        self.test_df = None
-        self.games_df = None
-        self.turns_df = None
-        self.best_model_path = None
         self._setup()
 
     def _setup(self):
