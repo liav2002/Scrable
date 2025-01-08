@@ -3,12 +3,17 @@ import pickle
 from tabulate import tabulate
 from datetime import datetime
 
+from xgboost import XGBRegressor
+from sklearn.linear_model import LinearRegression
+from sklearn.neural_network import MLPRegressor
+
 from src.utils.config_loader import load_config
 from src.utils.logger import logger, FileLogger
 from src.utils.data_loader import load_data, load_best_model_path
-from src.model.model_manager import run_models_and_get_best, get_model_instance
 
+from src.model.model_handler import ModelHandler
 from src.model.pipeline.pipeline import DataPipeline
+from src.model.model_manager import run_models_and_get_best
 
 LOG_DIR = "logs"
 CONFIG_PATH = "config/config.yaml"
@@ -57,34 +62,34 @@ class Solver:
         processed_train_df = pipeline.process_train_data(self.train_df)
         logger.log("Data processing completed.")
 
-        # Define models to evaluate
+        # Initialize model handlers
         models = {}
-        if self.config["hyperparameter_tuning"]["search_best_params"]:
-            logger.log("Performing hyperparameter tuning for all models.")
-            for model_name, model_details in self.config["models"].items():
-                model = get_model_instance(
-                    model_details["class"],
-                    model_details["params"]
+        for model_name, model_details in self.config["models"].items():
+            if model_name == "XGBoost":
+                model_type = XGBRegressor
+            elif model_name == "Linear Regression":
+                model_type = LinearRegression
+            elif model_name == "Neural Network":
+                model_type = MLPRegressor
+            else:
+                raise ValueError(f"Unsupported model type: {model_name}")
+
+            model_handler = ModelHandler(model=model_type, params=model_details["params"])
+
+            if self.config["hyperparameter_tuning"]["search_best_params"]:
+                logger.log(f"Performing hyperparameter tuning for {model_name}.")
+                best_params = model_handler.search_best_params(
+                    processed_train_df.drop(columns=["user_rating"]),
+                    processed_train_df["user_rating"],
+                    self.config["hyperparameter_tuning"]["search_space"],
+                    self.config["cross_validation"]["cv_folds"],
+                    self.config["cross_validation"]["scoring"]["rmse"],
+                    self.config["hyperparameter_tuning"]["trials"]
                 )
-                if hasattr(model, "search_best_params"):
-                    logger.log(f"Starting hyperparameter tuning for {model_name}.")
-                    best_params = model.search_best_params(
-                        processed_train_df.drop(columns=["user_rating"]),
-                        processed_train_df["user_rating"],
-                        self.config
-                    )
-                    logger.log(f"Best parameters for {model_name}: {best_params}")
-                    model_details["params"] = best_params
-                models[model_name] = model
-        else:
-            logger.log("Using predefined model parameters from configuration.")
-            models = {
-                model_name: get_model_instance(
-                    model_details["class"],
-                    model_details["params"]
-                )
-                for model_name, model_details in self.config["models"].items()
-            }
+                logger.log(f"Best parameters for {model_name}: {best_params}")
+                model_handler.params.update(best_params)
+
+            models[model_name] = model_handler
 
         logger.log("Models initialized.")
 
@@ -106,7 +111,7 @@ class Solver:
 
         # Save the best model as a pickle file
         with open(self.best_model_path, "wb") as f:
-            pickle.dump(best_model, f)
+            pickle.dump(best_model.model, f)
         logger.log(f"Best model saved to {self.best_model_path}.")
 
     def test_best_model(self):
