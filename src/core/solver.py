@@ -1,5 +1,6 @@
 import os
 import pickle
+from tabulate import tabulate
 from datetime import datetime
 
 from src.utils.config_loader import load_config
@@ -91,7 +92,7 @@ class Solver:
         results_df, best_model = run_models_and_get_best(processed_train_df, models, self.config)
         logger.log("Model evaluation completed.")
         logger.log("Model Performance Summary:")
-        logger.log(results_df.to_string(index=False))
+        logger.log(tabulate(results_df, headers="keys", tablefmt="pretty"))
 
         # Train the best model on the entire training data
         logger.log("Training the best model on the full dataset.")
