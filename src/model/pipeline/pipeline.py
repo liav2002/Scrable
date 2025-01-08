@@ -1,16 +1,16 @@
 import pandas as pd
 from sklearn.pipeline import Pipeline
 
-from model.pipeline.transformers.data_cleaning.reorder_columns import ReorderColumns
-from model.pipeline.transformers.feature_engineering.add_is_first_play import AddIsFirstPlay
-from model.pipeline.transformers.feature_engineering.add_bot_difficulty import AddBotDifficulty
-from model.pipeline.transformers.feature_engineering.add_mean_rack_usage import AddMeanRackUsage
-from model.pipeline.transformers.data_cleaning.drop_features_from_train import DropFeaturesFromTrain
-from model.pipeline.transformers.data_cleaning.split_and_trasform_train import SplitAndTransformTrain
-from model.pipeline.transformers.data_cleaning.merge_features_from_games import MergeFeaturesFromGames
-from model.pipeline.transformers.feature_engineering.add_negative_end_reason import AddNegativeEndReason
-from model.pipeline.transformers.data_cleaning.encode_categorial_features import EncodeCategoricalFeatures
-from model.pipeline.transformers.feature_engineering.add_mean_average_letter_score import AddMeanAverageLetterScore
+from src.model.pipeline.transformers.data_cleaning.reorder_columns import ReorderColumns
+from src.model.pipeline.transformers.feature_engineering.add_is_first_play import AddIsFirstPlay
+from src.model.pipeline.transformers.feature_engineering.add_bot_difficulty import AddBotDifficulty
+from src.model.pipeline.transformers.feature_engineering.add_mean_rack_usage import AddMeanRackUsage
+from src.model.pipeline.transformers.data_cleaning.drop_features_from_train import DropFeaturesFromTrain
+from src.model.pipeline.transformers.data_cleaning.split_and_trasform_train import SplitAndTransformTrain
+from src.model.pipeline.transformers.data_cleaning.merge_features_from_games import MergeFeaturesFromGames
+from src.model.pipeline.transformers.feature_engineering.add_negative_end_reason import AddNegativeEndReason
+from src.model.pipeline.transformers.data_cleaning.encode_categorial_features import EncodeCategoricalFeatures
+from src.model.pipeline.transformers.feature_engineering.add_mean_average_letter_score import AddMeanAverageLetterScore
 
 
 class DataPipeline:

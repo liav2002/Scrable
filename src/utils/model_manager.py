@@ -1,6 +1,6 @@
 import importlib
 import pandas as pd
-from utils.logger import Logger
+from src.utils.logger import Logger
 
 
 def get_model_instance(model_class_path: str, params: dict = None):

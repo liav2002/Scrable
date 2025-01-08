@@ -1,7 +1,7 @@
 import yaml
 import pandas as pd
 from typing import Tuple
-from utils.logger import Logger
+from src.utils.logger import Logger
 
 
 def load_data(logger: Logger) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:

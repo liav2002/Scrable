@@ -1,22 +1,21 @@
-from model.pipeline.transformers.abstract_tranformer import AbstractTransformer
-from typing import List, Dict
+from src.model.pipeline.transformers.abstract_tranformer import AbstractTransformer
+from typing import Dict
 import pandas as pd
 
 
-class AddIsFirstPlay(AbstractTransformer):
+class AddNegativeEndReason(AbstractTransformer):
     """
-    Transformer to create the `is_first_play` feature from `games_df`
+    Transformer to create the `negative_end_reason` feature from `games_df`
     and merge it into `train_df`.
     """
 
-    def __init__(self, bot_names: List[str]):
+    def __init__(self):
         """
-        Parameters:
-        bot_names (list of str): List of bot names.
+        Initialize the transformer.
         """
-        self.bot_names = bot_names
+        pass
 
-    def fit(self, X: Dict[str, pd.DataFrame], y: None = None) -> "AddIsFirstPlay":
+    def fit(self, X: Dict[str, pd.DataFrame], y: None = None) -> "AddNegativeEndReason":
         """
         Fit method for compatibility with the pipeline.
 
@@ -31,26 +30,27 @@ class AddIsFirstPlay(AbstractTransformer):
 
     def transform(self, data: Dict[str, pd.DataFrame]) -> Dict[str, pd.DataFrame]:
         """
-        Add the `is_first_play` feature to `train_df` based on `games_df`.
+        Add the `negative_end_reason` feature from `games_df` to `train_df`.
 
         Parameters:
         data (dict): A dictionary containing `train_df` and `games_df`.
 
         Returns:
-        dict: Updated data dictionary with `is_first_play` added to `train_df`.
+        dict: Updated data dictionary with `negative_end_reason` added to `train_df`.
         """
         train_df = data["train_df"].copy()
         games_df = data["games_df"].copy()
 
-        games_df["is_first_play"] = games_df["first"].apply(
-            lambda x: 1 if x not in self.bot_names else 0
+        games_df["negative_end_reason"] = games_df["game_end_reason"].apply(
+            lambda x: 1 if x in ["RESIGNED", "TIME", "CONSECUTIVE_ZEROS"] else 0
         )
 
         train_df = train_df.merge(
-            games_df[["game_id", "is_first_play"]],
+            games_df[["game_id", "negative_end_reason"]],
             on="game_id",
             how="left"
         )
 
         data["train_df"] = train_df
+        data["games_df"] = games_df
         return data

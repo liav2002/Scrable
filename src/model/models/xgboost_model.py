@@ -3,7 +3,7 @@ import pandas as pd
 from typing import Dict
 from xgboost import XGBRegressor
 from sklearn.model_selection import cross_validate
-from model.models.base_model import BaseModel
+from src.model.models.base_model import BaseModel
 
 
 class XGBoostModel(BaseModel):

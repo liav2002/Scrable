@@ -1,4 +1,4 @@
-from utils.solver import Solver
+from src.utils.solver import Solver
 
 def main():
     solver = Solver()
