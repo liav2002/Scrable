@@ -5,10 +5,8 @@ bots_and_scores:
 
 models:
   Linear Regression:
-    class: "src.model.models.regression_model.RegressionModel"
-    params: {}
+    params: { }
   XGBoost:
-    class: "src.model.models.xgboost_model.XGBoostModel"
     params:
       n_estimators: 291
       max_depth: 10
@@ -17,9 +15,8 @@ models:
       colsample_bytree: 0.7941578206631733
       random_state: 42
   Neural Network:
-    class: "src.model.models.neural_network_model.NeuralNetworkModel"
     params:
-      hidden_layer_sizes: [64, 32]
+      hidden_layer_sizes: [ 64, 32 ]
       activation: "tanh"
       solver: "adam"
       learning_rate_init: 0.020267548486620213
@@ -29,16 +26,34 @@ models:
 hyperparameter_tuning:
   search_best_params: false
   trials: 5
-  neural_network_search_space:
-    hidden_layer_sizes: [[128, 64], [64, 32], [128, 64, 32]]
-    activation: ["relu", "tanh"]
-    learning_rate_init_range: [1e-5, 1e-1]
-  xgboost_search_space:
-    max_depth: [3, 10]
-    learning_rate_range: [1e-4, 1e-1]
-    n_estimators_range: [100, 500]
-    subsample_range: [0.5, 1.0]
-    colsample_bytree_range: [0.5, 1.0]
+  search_space:
+    Linear Regression: { }
+    XGBoost:
+      max_depth:
+        value: [ 3, 10 ]
+        type: int
+      learning_rate:
+        value: [ 1e-4, 1e-1 ]
+        type: float
+      n_estimators:
+        value: [ 100, 500 ]
+        type: int
+      subsample:
+        value: [ 0.5, 1.0 ]
+        type: float
+      colsample_bytree:
+        value: [ 0.5, 1.0 ]
+        type: float
+    Neural Network:
+      hidden_layer_sizes:
+        value: [ [ 128, 64 ], [ 64, 32 ], [ 128, 64, 32 ] ]
+        type: categorical
+      activation:
+        value: [ "relu", "tanh" ]
+        type: categorical
+      learning_rate_init:
+        value: [ 1e-5, 1e-1 ]
+        type: float
 
 cross_validation:
   cv_folds: 5
