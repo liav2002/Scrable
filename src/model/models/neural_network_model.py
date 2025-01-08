@@ -1,8 +1,10 @@
 import optuna
 import pandas as pd
 from typing import Dict
+
 from sklearn.neural_network import MLPRegressor
 from sklearn.model_selection import cross_validate
+
 from src.model.models.base_model import BaseModel
 
 

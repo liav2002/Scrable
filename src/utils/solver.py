@@ -11,12 +11,14 @@ from src.model.pipeline.pipeline import DataPipeline
 
 LOG_DIR = "logs"
 
+
 class Solver:
     """
     The Solver class is responsible for orchestrating the end-to-end machine learning pipeline for the Scrabble project.
     It handles configuration setup, data loading, model initialization, hyperparameter tuning, training, evaluation,
     and prediction on test data. The class also manages logging to ensure traceability throughout the process.
     """
+
     def __init__(self):
         """
         Initialize the Solver class with necessary configurations and logger setup.

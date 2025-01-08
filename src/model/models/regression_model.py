@@ -1,8 +1,10 @@
 import numpy as np
 from typing import Dict
+
+from sklearn.base import BaseEstimator
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import cross_validate
-from sklearn.base import BaseEstimator
+
 from src.model.models.base_model import BaseModel
 
 

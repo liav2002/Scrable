@@ -1,6 +1,7 @@
-from src.model.pipeline.transformers.abstract_tranformer import AbstractTransformer
-from typing import List, Dict
 import pandas as pd
+from typing import List, Dict
+
+from src.model.pipeline.transformers.abstract_tranformer import AbstractTransformer
 
 
 class AddIsFirstPlay(AbstractTransformer):

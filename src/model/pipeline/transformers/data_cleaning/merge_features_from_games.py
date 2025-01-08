@@ -1,5 +1,6 @@
-from src.model.pipeline.transformers.abstract_tranformer import AbstractTransformer
 from typing import List, Dict
+
+from src.model.pipeline.transformers.abstract_tranformer import AbstractTransformer
 
 
 class MergeFeaturesFromGames(AbstractTransformer):

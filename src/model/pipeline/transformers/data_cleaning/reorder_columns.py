@@ -1,5 +1,6 @@
-from src.model.pipeline.transformers.abstract_tranformer import AbstractTransformer
 from typing import Dict
+
+from src.model.pipeline.transformers.abstract_tranformer import AbstractTransformer
 
 
 class ReorderColumns(AbstractTransformer):

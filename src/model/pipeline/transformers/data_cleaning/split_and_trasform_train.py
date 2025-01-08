@@ -1,6 +1,7 @@
-from src.model.pipeline.transformers.abstract_tranformer import AbstractTransformer
 import pandas as pd
 from typing import Dict
+
+from src.model.pipeline.transformers.abstract_tranformer import AbstractTransformer
 
 
 class SplitAndTransformTrain(AbstractTransformer):
