@@ -5,7 +5,7 @@ from datetime import datetime
 from src.utils.config_loader import load_config
 from src.utils.logger import logger, FileLogger
 from src.utils.data_loader import load_data, load_best_model_path
-from src.utils.model_manager import run_models_and_get_best, get_model_instance
+from src.model.model_manager import run_models_and_get_best, get_model_instance
 
 from src.model.pipeline.pipeline import DataPipeline
 
