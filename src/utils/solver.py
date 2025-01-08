@@ -10,6 +10,7 @@ from src.utils.model_manager import run_models_and_get_best, get_model_instance
 from src.model.pipeline.pipeline import DataPipeline
 
 LOG_DIR = "logs"
+CONFIG_PATH = "config/config.yaml"
 
 
 class Solver:
@@ -32,12 +33,12 @@ class Solver:
         Private method to set up logging, configuration, and data loading.
         """
         runtime_signature = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        log_file_path = LOG_DIR + "/{runtime_signature}.log"
+        log_file_path = LOG_DIR + f"/{runtime_signature}.log"
         file_logger = FileLogger(log_file_path)
         self.logger.subscribe(file_logger)
 
         self.logger.log("Application started.")
-        self.config = load_config()
+        self.config = load_config(CONFIG_PATH)
         self.logger.log("Configuration loaded.")
 
         self.train_df, self.test_df, self.games_df, self.turns_df = load_data(self.logger)
