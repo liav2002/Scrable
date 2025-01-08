@@ -12,6 +12,7 @@ from src.model.pipeline.pipeline import DataPipeline
 
 LOG_DIR = "logs"
 CONFIG_PATH = "config/config.yaml"
+FALSE_ANALYSIS_DIR = "output/false_analysis_df/"
 
 
 class Solver:
@@ -45,7 +46,6 @@ class Solver:
         logger.log("Data loaded successfully.")
 
         self.best_model_path = load_best_model_path()
-        logger.log("Best model will be saved on: " + self.best_model_path)
 
     def find_best_model(self):
         """
@@ -139,3 +139,47 @@ class Solver:
         logger.log("First 10 predictions:")
         for idx, pred in enumerate(predictions[:10]):
             logger.log(f"Prediction {idx + 1}: {pred:.4f}")
+
+    def false_analysis(self):
+        """
+        Perform false analysis on the model's predictions, identifying the most significant errors.
+        """
+        if not os.path.exists(self.best_model_path):
+            logger.log(
+                f"Error: Best model file '{self.best_model_path}' not found. Please run 'find_best_model' first.")
+            raise FileNotFoundError(
+                f"Best model file '{self.best_model_path}' not found. Please run 'find_best_model' first."
+            )
+
+        # Load the best model
+        logger.log(f"Loading the best model from {self.best_model_path}.")
+        with open(self.best_model_path, "rb") as f:
+            best_model = pickle.load(f)
+
+        # Initialize the pipeline and process the training data
+        logger.log("Initializing data pipeline for false analysis.")
+        pipeline = DataPipeline(self.config["bots_and_scores"], self.turns_df, self.games_df)
+        processed_train_df = pipeline.process_train_data(self.train_df)
+        logger.log("Data pipeline processing for training data completed.")
+
+        # Make predictions on the processed training data
+        logger.log("Making predictions on the training data for false analysis.")
+        predictions = best_model.predict(processed_train_df.drop(columns=["user_rating"]))
+
+        # Add new columns to the dataframe
+        logger.log("Adding 'predicted_user_rating' and 'error' columns.")
+        processed_train_df["predicted_user_rating"] = predictions
+        processed_train_df["error"] = (
+                processed_train_df["user_rating"] - processed_train_df["predicted_user_rating"]
+        ).abs()
+
+        # Sort by the error column in descending order
+        logger.log("Sorting the dataframe by 'error' in descending order.")
+        sorted_df = processed_train_df.sort_values(by="error", ascending=False)
+
+        # Save the dataframe to the output directory
+        logger.log(f"Saving sorted dataframe to {FALSE_ANALYSIS_DIR}.")
+        os.makedirs(FALSE_ANALYSIS_DIR, exist_ok=True)
+        output_path = os.path.join(FALSE_ANALYSIS_DIR, "false_analysis.csv")
+        sorted_df.to_csv(output_path, index=False)
+        logger.log(f"False analysis dataframe saved to {output_path}.")
