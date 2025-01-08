@@ -9,6 +9,7 @@ from src.utils.model_manager import run_models_and_get_best, get_model_instance
 
 from src.model.pipeline.pipeline import DataPipeline
 
+LOG_DIR = "logs"
 
 class Solver:
     """
@@ -29,7 +30,7 @@ class Solver:
         Private method to set up logging, configuration, and data loading.
         """
         runtime_signature = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        log_file_path = f"logs/{runtime_signature}.log"
+        log_file_path = LOG_DIR + "/{runtime_signature}.log"
         file_logger = FileLogger(log_file_path)
         self.logger.subscribe(file_logger)
 
