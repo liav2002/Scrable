@@ -5,10 +5,10 @@ bots_and_scores:
 
 models:
   Linear Regression:
-    class: "model.models.regression_model.RegressionModel"
+    class: "src.model.models.regression_model.RegressionModel"
     params: {}
   XGBoost:
-    class: "model.models.xgboost_model.XGBoostModel"
+    class: "src.model.models.xgboost_model.XGBoostModel"
     params:
       n_estimators: 291
       max_depth: 10
@@ -17,7 +17,7 @@ models:
       colsample_bytree: 0.7941578206631733
       random_state: 42
   Neural Network:
-    class: "model.models.neural_network_model.NeuralNetworkModel"
+    class: "src.model.models.neural_network_model.NeuralNetworkModel"
     params:
       hidden_layer_sizes: [64, 32]
       activation: "tanh"

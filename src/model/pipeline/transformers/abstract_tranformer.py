@@ -1,6 +1,5 @@
-import numpy as np
 import pandas as pd
-from typing import Any, Optional
+from typing import Optional
 from abc import ABC, abstractmethod
 from sklearn.base import BaseEstimator, TransformerMixin
 
