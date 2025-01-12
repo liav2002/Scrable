@@ -1,7 +1,7 @@
-import optuna
+from typing import Dict, Union
 import numpy as np
 import pandas as pd
-from typing import Dict, Union
+import optuna
 
 from sklearn.model_selection import cross_validate
 
