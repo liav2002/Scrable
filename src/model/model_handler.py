@@ -1,4 +1,4 @@
-from typing import Dict, Union, Protocol
+from typing import Any, Dict, Union, Protocol
 import numpy as np
 import pandas as pd
 import optuna
