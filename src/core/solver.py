@@ -15,9 +15,7 @@ from src.model.model_handler import ModelHandler
 from src.model.pipeline.pipeline import DataPipeline
 from src.model.model_manager import run_models_and_get_best
 
-LOG_DIR = "logs"
-CONFIG_PATH = "config/config.yaml"
-FALSE_ANALYSIS_DIR = "output/false_analysis_df/"
+from config.consts import LOG_DIR, CONFIG_PATH, FALSE_ANALYSIS_DIR
 
 
 class Solver:
