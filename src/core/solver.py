@@ -61,17 +61,13 @@ class Solver:
         logger.log("Data processing completed.")
 
         # Initialize model handlers
+        model_2_class_map = {"XGBoost": XGBRegressor, "Linear Regression": LinearRegression,
+                             "Neural Network": MLPRegressor}
         models = {}
         for model_name, model_details in self.config["models"].items():
-            if model_name == "XGBoost":
-                model_type = XGBRegressor
-            elif model_name == "Linear Regression":
-                model_type = LinearRegression
-            elif model_name == "Neural Network":
-                model_type = MLPRegressor
-            else:
+            if model_name not in model_2_class_map.keys():
                 raise ValueError(f"Unsupported model type: {model_name}")
-
+            model_type = model_2_class_map[model_name]
             model_handler = ModelHandler(model=model_type, params=model_details["params"])
 
             if self.config["hyperparameter_tuning"]["search_best_params"]:
