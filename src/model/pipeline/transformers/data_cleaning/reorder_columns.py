@@ -1,5 +1,7 @@
-from model.pipeline.transformers.abstract_tranformer import AbstractTransformer
 from typing import Dict
+import pandas as pd
+
+from src.model.pipeline.transformers.abstract_tranformer import AbstractTransformer
 
 
 class ReorderColumns(AbstractTransformer):
@@ -15,12 +17,12 @@ class ReorderColumns(AbstractTransformer):
         """
         self.target_column = target_column
 
-    def fit(self, X: Dict[str, object], y: None = None) -> "ReorderColumns":
+    def fit(self, X: Dict[str, pd.DataFrame], y: None = None) -> "ReorderColumns":
         """
         Fit method for compatibility with the pipeline.
 
         Parameters:
-        X (dict): A dictionary containing `train_df`.
+        X (dict): A dictionary containing a `train_df` DataFrame.
         y: Ignored.
 
         Returns:
@@ -28,21 +30,20 @@ class ReorderColumns(AbstractTransformer):
         """
         return self
 
-    def transform(self, data: Dict[str, object]) -> Dict[str, object]:
+    def transform(self, data: Dict[str, pd.DataFrame]) -> Dict[str, pd.DataFrame]:
         """
         Reorder columns in the `train_df` so that the target column is last.
 
         Parameters:
-        data (dict): A dictionary containing `train_df`.
+        data (dict): A dictionary containing a `train_df` DataFrame.
 
         Returns:
         dict: Updated data dictionary with reordered `train_df`.
         """
-        train_df = data["train_df"].copy()
+        train_df = data["train_df"]
 
         if self.target_column in train_df.columns:
             columns = [col for col in train_df.columns if col != self.target_column]
-            train_df = train_df[columns + [self.target_column]]
+            data["train_df"] = train_df[columns + [self.target_column]]
 
-        data["train_df"] = train_df
         return data

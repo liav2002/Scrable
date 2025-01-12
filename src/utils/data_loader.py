@@ -1,10 +1,12 @@
-import yaml
-import pandas as pd
 from typing import Tuple
-from utils.logger import Logger
+import pandas as pd
+import yaml
+
+from src.utils.logger import logger
+from config.consts import CONFIG_FILE_PATHS
 
 
-def load_data(logger: Logger) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def load_data() -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
     Load source data from the data directory.
 
@@ -17,7 +19,7 @@ def load_data(logger: Logger) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame,
             turns_df: DataFrame for turns data.
     """
     logger.log("Loading data paths from configuration...")
-    with open("Config/file_paths.yaml", "r") as file:
+    with open(CONFIG_FILE_PATHS, "r") as file:
         paths = yaml.safe_load(file)["data_paths"]
 
     logger.log("Reading train.csv...")
@@ -34,3 +36,8 @@ def load_data(logger: Logger) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame,
 
     logger.log("Data loading complete.")
     return train_df, test_df, games_df, turns_df
+
+
+def load_best_model_path() -> str:
+    with open("config/file_paths.yaml", "r") as file:
+        return yaml.safe_load(file)["output_path"]["best_model"]

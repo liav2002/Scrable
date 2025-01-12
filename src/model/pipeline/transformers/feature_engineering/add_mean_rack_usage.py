@@ -1,6 +1,7 @@
-from model.pipeline.transformers.abstract_tranformer import AbstractTransformer
 from typing import Dict
 import pandas as pd
+
+from src.model.pipeline.transformers.abstract_tranformer import AbstractTransformer
 
 
 class AddMeanRackUsage(AbstractTransformer):

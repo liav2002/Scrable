@@ -1,8 +1,8 @@
+from typing import Optional
 from abc import ABC, abstractmethod
-from sklearn.base import BaseEstimator, TransformerMixin
-from typing import Any, Optional
 import pandas as pd
-import numpy as np
+
+from sklearn.base import BaseEstimator, TransformerMixin
 
 
 class AbstractTransformer(BaseEstimator, TransformerMixin, ABC):
