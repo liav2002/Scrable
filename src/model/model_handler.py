@@ -1,9 +1,38 @@
-from typing import Dict, Union
+from typing import Dict, Union, Protocol
 import numpy as np
 import pandas as pd
 import optuna
 
 from sklearn.model_selection import cross_validate
+
+
+class ModelProtocol(Protocol):
+    """
+    Protocol for machine learning models.
+    Any class implementing this protocol must have the `fit` and `predict` methods.
+    """
+
+    def fit(self, X: Any, y: Any) -> None:
+        """
+        Fit the model to the training data.
+
+        Args:
+            X (Any): Feature matrix.
+            y (Any): Target variable.
+        """
+        ...
+
+    def predict(self, X: Any) -> Any:
+        """
+        Predict using the trained model.
+
+        Args:
+            X (Any): Feature matrix.
+
+        Returns:
+            Any: Predicted values.
+        """
+        ...
 
 
 class ModelHandler:
@@ -12,7 +41,7 @@ class ModelHandler:
     and hyperparameter tuning.
     """
 
-    def __init__(self, model: type, params: Dict[str, Union[int, float, str]]) -> None:
+    def __init__(self, model: ModelProtocol, params: Dict[str, Union[int, float, str]]) -> None:
         """
         Initializes the ModelHandler.
 
