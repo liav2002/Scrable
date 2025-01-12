@@ -15,7 +15,7 @@ from src.model.model_handler import ModelHandler
 from src.model.pipeline.pipeline import DataPipeline
 from src.model.model_manager import run_models_and_get_best
 
-from config.consts import LOG_DIR, CONFIG_PATH, FALSE_ANALYSIS_DIR
+from config.consts import LOG_DIR, CONFIG_PATH, FALSE_ANALYSIS_DIR, FALSE_ANALYSIS_FILE
 
 
 class Solver:
@@ -183,6 +183,6 @@ class Solver:
         # Save the dataframe to the output directory
         logger.log(f"Saving sorted dataframe to {FALSE_ANALYSIS_DIR}.")
         os.makedirs(FALSE_ANALYSIS_DIR, exist_ok=True)
-        output_path = os.path.join(FALSE_ANALYSIS_DIR, "false_analysis.csv")
+        output_path = os.path.join(FALSE_ANALYSIS_DIR, FALSE_ANALYSIS_FILE)
         sorted_df.to_csv(output_path, index=False)
         logger.log(f"False analysis dataframe saved to {output_path}.")
