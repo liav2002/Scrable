@@ -13,5 +13,3 @@ optuna>=3.0.0
 
 # Optional dependencies for Neural Network models
 scipy>=1.7.0
-
-DateTime~=5.5
