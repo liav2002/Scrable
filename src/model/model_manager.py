@@ -1,3 +1,4 @@
+from typing import Dict, Tuple
 import pandas as pd
 
 from src.utils.logger import logger
@@ -5,9 +6,9 @@ from src.utils.logger import logger
 
 def run_models_and_get_best(
         train_df: pd.DataFrame,
-        models: dict,
+        models: Dict[str, "ModelHandler"],
         config: dict
-) -> tuple:
+) -> Tuple[pd.DataFrame, "ModelHandler"]:
     """
     Train and evaluate multiple models using their respective evaluate methods,
     and determine the best model by a configurable metric.
