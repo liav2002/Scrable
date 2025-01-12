@@ -3,10 +3,6 @@ import pickle
 from tabulate import tabulate
 from datetime import datetime
 
-from xgboost import XGBRegressor
-from sklearn.linear_model import LinearRegression
-from sklearn.neural_network import MLPRegressor
-
 from src.utils.config_loader import load_config
 from src.utils.logger import logger, FileLogger
 from src.utils.data_loader import load_data, load_best_model_path
@@ -16,6 +12,7 @@ from src.model.pipeline.pipeline import DataPipeline
 from src.model.model_manager import run_models_and_get_best
 
 from config.consts import LOG_DIR, CONFIG_PATH, FALSE_ANALYSIS_DIR, FALSE_ANALYSIS_FILE
+from config.consts import MODEL_2_CLASS_MAP
 
 
 class Solver:
@@ -61,13 +58,11 @@ class Solver:
         logger.log("Data processing completed.")
 
         # Initialize model handlers
-        model_2_class_map = {"XGBoost": XGBRegressor, "Linear Regression": LinearRegression,
-                             "Neural Network": MLPRegressor}
         models = {}
         for model_name, model_details in self.config["models"].items():
-            if model_name not in model_2_class_map.keys():
+            if model_name not in MODEL_2_CLASS_MAP.keys():
                 raise ValueError(f"Unsupported model type: {model_name}")
-            model_type = model_2_class_map[model_name]
+            model_type = MODEL_2_CLASS_MAP[model_name]
             model_handler = ModelHandler(model=model_type, params=model_details["params"])
 
             if self.config["hyperparameter_tuning"]["search_best_params"]:
