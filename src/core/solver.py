@@ -37,7 +37,7 @@ class Solver:
         Private method to set up logging, configuration, and data loading.
         """
         runtime_signature = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        log_file_path = LOG_DIR + f"/{runtime_signature}.log"
+        log_file_path = os.path.join(LOG_DIR, f"{runtime_signature}.log")
         file_logger = FileLogger(log_file_path)
         logger.subscribe(file_logger)
 
