@@ -12,7 +12,7 @@ from src.model.pipeline.pipeline import DataPipeline
 from src.model.model_manager import run_models_and_get_best
 
 from config.consts import LOG_DIR, CONFIG_PATH, FALSE_ANALYSIS_DIR, FALSE_ANALYSIS_FILE
-from config.consts import MODEL_2_CLASS_MAP
+from config.consts import MODEL_TO_CLASS_MAP
 
 
 class Solver:
@@ -60,9 +60,9 @@ class Solver:
         # Initialize model handlers
         models = {}
         for model_name, model_details in self.config["models"].items():
-            if model_name not in MODEL_2_CLASS_MAP.keys():
+            if model_name not in MODEL_TO_CLASS_MAP.keys():
                 raise ValueError(f"Unsupported model type: {model_name}")
-            model_type = MODEL_2_CLASS_MAP[model_name]
+            model_type = MODEL_TO_CLASS_MAP[model_name]
             model_handler = ModelHandler(model=model_type, params=model_details["params"])
 
             if self.config["hyperparameter_tuning"]["search_best_params"]:
