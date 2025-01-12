@@ -15,7 +15,7 @@ def run_models_and_get_best(
 
     Args:
         train_df (pd.DataFrame): Processed training data.
-        models (dict): A dictionary of ModelHandler instances to evaluate.
+        models (Dict[str, ModelHandler]): A dictionary of ModelHandler instances to evaluate.
         config (dict): Configuration dictionary.
 
     Returns:
