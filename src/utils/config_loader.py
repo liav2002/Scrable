@@ -1,5 +1,6 @@
 import yaml
 
+
 def load_config(file_path: str = None) -> dict:
     """
     Load the configuration file.

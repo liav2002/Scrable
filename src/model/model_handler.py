@@ -47,12 +47,12 @@ class ModelHandler:
         return self.model.predict(X)
 
     def evaluate(
-        self,
-        X: pd.DataFrame,
-        y: pd.Series,
-        cv_folds: int,
-        scoring: Dict[str, str],
-        return_train_score: bool
+            self,
+            X: pd.DataFrame,
+            y: pd.Series,
+            cv_folds: int,
+            scoring: Dict[str, str],
+            return_train_score: bool
     ) -> Dict[str, float]:
         """
         Evaluates the model using cross-validation.
@@ -83,13 +83,13 @@ class ModelHandler:
         return metrics
 
     def search_best_params(
-        self,
-        X: pd.DataFrame,
-        y: pd.Series,
-        search_space: Dict[str, Dict[str, Dict[str, Union[str, list]]]],
-        cv_folds: int,
-        scoring: str,
-        n_trials: int
+            self,
+            X: pd.DataFrame,
+            y: pd.Series,
+            search_space: Dict[str, Dict[str, Dict[str, Union[str, list]]]],
+            cv_folds: int,
+            scoring: str,
+            n_trials: int
     ) -> Dict[str, Union[int, float, str]]:
         """
         Performs hyperparameter tuning using Optuna.

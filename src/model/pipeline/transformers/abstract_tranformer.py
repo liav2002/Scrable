@@ -1,6 +1,7 @@
-import pandas as pd
 from typing import Optional
 from abc import ABC, abstractmethod
+import pandas as pd
+
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
