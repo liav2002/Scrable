@@ -1,0 +1,68 @@
+bots_and_scores:
+  BetterBot: 268240632
+  STEEBot: 276067680
+  HastyBot: 588506671
+
+models:
+  Linear Regression:
+    params: { }
+  XGBoost:
+    params:
+      n_estimators: 291
+      max_depth: 10
+      learning_rate: 0.017144109417060908
+      subsample: 0.9007674152662399
+      colsample_bytree: 0.7941578206631733
+      random_state: 42
+  Neural Network:
+    params:
+      hidden_layer_sizes: [ 64, 32 ]
+      activation: "tanh"
+      solver: "adam"
+      learning_rate_init: 0.020267548486620213
+      max_iter: 300
+      random_state: 42
+
+hyperparameter_tuning:
+  search_best_params: false
+  trials: 5
+  search_space:
+    Linear Regression: { }
+    XGBoost:
+      max_depth:
+        value: [ 3, 10 ]
+        type: int
+      learning_rate:
+        value: [ 1e-4, 1e-1 ]
+        type: float
+      n_estimators:
+        value: [ 100, 500 ]
+        type: int
+      subsample:
+        value: [ 0.5, 1.0 ]
+        type: float
+      colsample_bytree:
+        value: [ 0.5, 1.0 ]
+        type: float
+    Neural Network:
+      hidden_layer_sizes:
+        value: [ [ 128, 64 ], [ 64, 32 ], [ 128, 64, 32 ] ]
+        type: categorical
+      activation:
+        value: [ "relu", "tanh" ]
+        type: categorical
+      learning_rate_init:
+        value: [ 1e-5, 1e-1 ]
+        type: float
+
+dataset_split:
+  validation_split: 0.2
+  random_seed: 42
+
+cross_validation:
+  cv_folds: 5
+  scoring:
+    rmse: "neg_root_mean_squared_error"
+    mae: "neg_mean_absolute_error"
+  return_train_score: true
+  best_metric_key: "rmse"
