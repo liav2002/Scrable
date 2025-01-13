@@ -1,5 +1,6 @@
 import os
 import pickle
+import pandas as pd
 from tabulate import tabulate
 from datetime import datetime
 
@@ -13,7 +14,7 @@ from src.model.model_handler import ModelHandler
 from src.model.pipeline.pipeline import DataPipeline
 from src.model.model_manager import run_models_and_get_best
 
-from config.consts import LOG_DIR, CONFIG_PATH, FALSE_ANALYSIS_DIR, FALSE_ANALYSIS_FILE
+from config.consts import LOG_DIR, CONFIG_PATH, FALSE_ANALYSIS_DIR, FALSE_ANALYSIS_FILE, SUBMISSION_FILE_PATH
 from config.consts import MODEL_TO_CLASS_MAP
 
 
@@ -188,7 +189,21 @@ class Solver:
         logger.log("Making predictions on the test data.")
         predictions = best_model.predict(processed_test_df.drop(columns=["user_rating"], errors="ignore"))
 
-        # Print first 10 predictions
-        logger.log("First 10 predictions:")
-        for idx, pred in enumerate(predictions[:10]):
-            logger.log(f"Prediction {idx + 1}: {pred:.4f}")
+        # Remove duplicate game_ids, keeping only the first occurrence
+        logger.log("Removing duplicate game_ids in the test data.")
+        unique_test_df = self.test_df.drop_duplicates(subset="game_id", keep="first")
+
+        # Create the submission DataFrame
+        logger.log("Creating the submission DataFrame.")
+        submission_df = pd.DataFrame({
+            "game_id": unique_test_df["game_id"],
+            "rating": predictions
+        })
+
+        # Save the submission DataFrame to the output folder
+        submission_df.to_csv(SUBMISSION_FILE_PATH, index=False)
+        logger.log(f"Submission file saved to {SUBMISSION_FILE_PATH}.")
+
+        # Log a preview of the submission file
+        logger.log("Submission DataFrame preview:")
+        logger.log(tabulate(submission_df.head(10), headers="keys", tablefmt="pretty"))
