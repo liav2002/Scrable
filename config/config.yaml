@@ -55,6 +55,10 @@ hyperparameter_tuning:
         value: [ 1e-5, 1e-1 ]
         type: float
 
+dataset_split:
+  validation_split: 0.2
+  random_seed: 42
+
 cross_validation:
   cv_folds: 5
   scoring:

@@ -3,6 +3,8 @@ import pickle
 from tabulate import tabulate
 from datetime import datetime
 
+from sklearn.model_selection import train_test_split
+
 from src.utils.config_loader import load_config
 from src.utils.logger import logger, FileLogger
 from src.utils.data_loader import load_data, load_best_model_path
@@ -27,6 +29,7 @@ class Solver:
         Initialize the Solver class with necessary configurations and logger setup.
         """
         self.config = self.train_df = self.test_df = self.games_df = self.turns_df = self.best_model_path = None
+        self.validation_set = None
         self._setup()
 
     def _setup(self):
@@ -49,19 +52,30 @@ class Solver:
 
     def find_best_model(self):
         """
-        Find the best model by evaluating all models, train the best model on the full dataset,
+        Find the best model by evaluating all models, train the best model on the training set,
         and save it as a pickle file.
         """
+        logger.log("Splitting data into training and validation sets.")
+        train_df, val_df = train_test_split(
+            self.train_df,
+            test_size=self.config["dataset_split"]["validation_split"],
+            random_state=self.config["dataset_split"]["random_seed"],
+        )
+        logger.log(f"Training set size: {len(train_df)}, Validation set size: {len(val_df)}.")
+
         logger.log("Initializing data pipeline for training.")
         pipeline = DataPipeline(self.config["bots_and_scores"], self.turns_df, self.games_df)
-        processed_train_df = pipeline.process_train_data(self.train_df)
+        processed_train_df = pipeline.process_train_data(train_df)
+        processed_val_df = pipeline.process_train_data(val_df)
         logger.log("Data processing completed.")
 
-        # Initialize model handlers
+        # Initialize models
         models = {}
         for model_name, model_details in self.config["models"].items():
+            # Ensure the model type is supported
             if model_name not in MODEL_TO_CLASS_MAP.keys():
                 raise ValueError(f"Unsupported model type: {model_name}")
+
             model_type = MODEL_TO_CLASS_MAP[model_name]
             model_handler = ModelHandler(model=model_type, params=model_details["params"])
 
@@ -73,7 +87,7 @@ class Solver:
                     self.config["hyperparameter_tuning"]["search_space"],
                     self.config["cross_validation"]["cv_folds"],
                     self.config["cross_validation"]["scoring"]["rmse"],
-                    self.config["hyperparameter_tuning"]["trials"]
+                    self.config["hyperparameter_tuning"]["trials"],
                 )
                 logger.log(f"Best parameters for {model_name}: {best_params}")
                 model_handler.params.update(best_params)
@@ -88,12 +102,15 @@ class Solver:
         logger.log("Model Performance Summary:")
         logger.log(tabulate(results_df, headers="keys", tablefmt="pretty"))
 
-        # Train the best model on the entire training data
-        logger.log("Training the best model on the full dataset.")
+        # Train the best model on the training set
+        logger.log("Training the best model on the training set.")
         best_model.fit(
             processed_train_df.drop(columns=["user_rating"]),
             processed_train_df["user_rating"]
         )
+
+        # Save the validation set for analysis
+        self.validation_set = processed_val_df
 
         # Ensure the output directory exists
         os.makedirs(os.path.dirname(self.best_model_path), exist_ok=True)
@@ -102,6 +119,48 @@ class Solver:
         with open(self.best_model_path, "wb") as f:
             pickle.dump(best_model.model, f)
         logger.log(f"Best model saved to {self.best_model_path}.")
+
+    def false_analysis(self):
+        """
+        Perform false analysis on the model's predictions using the validation set.
+        """
+        if not os.path.exists(self.best_model_path):
+            logger.log(
+                f"Error: Best model file '{self.best_model_path}' not found. Please run 'find_best_model' first.")
+            raise FileNotFoundError(
+                f"Best model file '{self.best_model_path}' not found. Please run 'find_best_model' first."
+            )
+
+        # Load the best model
+        logger.log(f"Loading the best model from {self.best_model_path}.")
+        with open(self.best_model_path, "rb") as f:
+            best_model = pickle.load(f)
+
+        # Use the saved validation set
+        logger.log("Using the saved validation set for false analysis.")
+        processed_val_df = self.validation_set
+
+        # Make predictions on the validation data
+        logger.log("Making predictions on the validation set for false analysis.")
+        predictions = best_model.predict(processed_val_df.drop(columns=["user_rating"]))
+
+        # Add new columns to the dataframe
+        logger.log("Adding 'predicted_user_rating' and 'error' columns.")
+        processed_val_df["predicted_user_rating"] = predictions
+        processed_val_df["error"] = (
+                processed_val_df["user_rating"] - processed_val_df["predicted_user_rating"]
+        ).abs()
+
+        # Sort by the error column in descending order
+        logger.log("Sorting the validation dataframe by 'error' in descending order.")
+        sorted_df = processed_val_df.sort_values(by="error", ascending=False)
+
+        # Save the sorted dataframe to the output directory
+        logger.log(f"Saving sorted dataframe to {FALSE_ANALYSIS_DIR}.")
+        os.makedirs(FALSE_ANALYSIS_DIR, exist_ok=True)
+        output_path = os.path.join(FALSE_ANALYSIS_DIR, FALSE_ANALYSIS_FILE)
+        sorted_df.to_csv(output_path, index=False)
+        logger.log(f"False analysis dataframe saved to {output_path}.")
 
     def test_best_model(self):
         """
@@ -133,47 +192,3 @@ class Solver:
         logger.log("First 10 predictions:")
         for idx, pred in enumerate(predictions[:10]):
             logger.log(f"Prediction {idx + 1}: {pred:.4f}")
-
-    def false_analysis(self):
-        """
-        Perform false analysis on the model's predictions, identifying the most significant errors.
-        """
-        if not os.path.exists(self.best_model_path):
-            logger.log(
-                f"Error: Best model file '{self.best_model_path}' not found. Please run 'find_best_model' first.")
-            raise FileNotFoundError(
-                f"Best model file '{self.best_model_path}' not found. Please run 'find_best_model' first."
-            )
-
-        # Load the best model
-        logger.log(f"Loading the best model from {self.best_model_path}.")
-        with open(self.best_model_path, "rb") as f:
-            best_model = pickle.load(f)
-
-        # Initialize the pipeline and process the training data
-        logger.log("Initializing data pipeline for false analysis.")
-        pipeline = DataPipeline(self.config["bots_and_scores"], self.turns_df, self.games_df)
-        processed_train_df = pipeline.process_train_data(self.train_df)
-        logger.log("Data pipeline processing for training data completed.")
-
-        # Make predictions on the processed training data
-        logger.log("Making predictions on the training data for false analysis.")
-        predictions = best_model.predict(processed_train_df.drop(columns=["user_rating"]))
-
-        # Add new columns to the dataframe
-        logger.log("Adding 'predicted_user_rating' and 'error' columns.")
-        processed_train_df["predicted_user_rating"] = predictions
-        processed_train_df["error"] = (
-                processed_train_df["user_rating"] - processed_train_df["predicted_user_rating"]
-        ).abs()
-
-        # Sort by the error column in descending order
-        logger.log("Sorting the dataframe by 'error' in descending order.")
-        sorted_df = processed_train_df.sort_values(by="error", ascending=False)
-
-        # Save the dataframe to the output directory
-        logger.log(f"Saving sorted dataframe to {FALSE_ANALYSIS_DIR}.")
-        os.makedirs(FALSE_ANALYSIS_DIR, exist_ok=True)
-        output_path = os.path.join(FALSE_ANALYSIS_DIR, FALSE_ANALYSIS_FILE)
-        sorted_df.to_csv(output_path, index=False)
-        logger.log(f"False analysis dataframe saved to {output_path}.")
